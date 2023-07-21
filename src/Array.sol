@@ -70,47 +70,4 @@ library Array {
 
         return finalResult;
     }
-
-    function divideByTwo(uint256[] memory arr) public pure returns (uint256[] memory) {
-        assembly {
-            // load the array length
-            let arrLength := mload(arr)
-
-            // loop through each
-            for { let i := 0 } lt(i, arrLength) { i := add(i, 1) } {
-                let currentValue := mload(add(arr, mul(add(i, 1), 0x20)))
-
-                // Divide the current value by 2 using right-shift (bit shifting)
-                let dividedValue := shr(1, currentValue)
-
-                mstore(add(arr, mul(add(i, 1), 0x20)), dividedValue)
-            }
-        }
-
-        return arr;
-    }
-
-    function trimBytes32Array(bytes32[] memory arr, uint256 newSize)
-        internal
-        pure
-        returns (bytes32[] memory trimmedArr)
-    {
-        require(arr.length >= newSize, "newSize is not smaller than original array size");
-
-        // Resize the array to remove any unused slots
-        trimmedArr = new bytes32[](newSize);
-        for (uint256 i = 0; i < newSize; i++) {
-            trimmedArr[i] = arr[i];
-        }
-    }
-
-    function trimBoolArray(bool[] memory arr, uint256 newSize) internal pure returns (bool[] memory trimmedArr) {
-        require(arr.length >= newSize, "newSize is not smaller than original array size");
-
-        // Resize the array to remove any unused slots
-        trimmedArr = new bool[](newSize);
-        for (uint256 i = 0; i < newSize; i++) {
-            trimmedArr[i] = arr[i];
-        }
-    }
 }

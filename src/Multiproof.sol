@@ -6,14 +6,21 @@ import {Array} from "src/Array.sol";
 
 library Multiproof {
     using Array for uint256[];
-    using Array for bytes32[];
-    using Array for bool[];
+
+    enum Children {
+        IS_LEAF,
+        ONE,
+        BOTH
+    }
 
     struct VirtualTreeNode {
         // determines whether to include this node in the multiproof
         bool includeInProof;
         // determines whether this node has already been processed during multiproof generation
         bool processed;
+        // determines how many children this node has (if any).
+        // This value will be used to compute the bool flags
+        Children children;
     }
 
     function _leftChildIndex(uint256 i) private pure returns (uint256) {
@@ -109,9 +116,8 @@ library Multiproof {
             treeIndicesToProve[i] = tree.length - 1 - leafIndicesToProve[i];
         }
 
-        // create flags array
-        flags = new bool[](virtualTree.length);
-        uint256 flagCounter;
+        uint256 flagTotal;
+        uint256 proofTotal;
 
         while (true) {
             // break when there is one index left to check, and its the root node
@@ -137,11 +143,15 @@ library Multiproof {
                     // if it has, then it means we have the full sibling pair that
                     // doesnt need to be included in the proof. So, we can set the
                     // false bool flag set by the sibling to true.
-                    flags[flagCounter - 1] = true;
+                    // flags[flagCounter - 1] = true;
+                    virtualTree[_parentIndex(treeIndex)].children = Children.BOTH;
 
                     // set this node to false in the virtual tree so it is not
                     // included in the final proof
                     virtualTree[treeIndex].includeInProof = false;
+
+                    // decrement proof counter because we removed a hash from the proof
+                    proofTotal--;
                 }
                 // this node hasnt been turned on by its sibling yet,
                 // so it hasnt appeared in the list of nodes to prove.
@@ -152,10 +162,14 @@ library Multiproof {
                     // now we make sure the flag array is false, because we need to include
                     // the sibling hash. This value can be overridden by the sibling
                     // if it is also included in the array of leaves to prove
-                    flags[flagCounter] = false;
+                    // flags[flagCounter] = false;
+                    virtualTree[_parentIndex(treeIndex)].children = Children.ONE;
 
                     // increment the flag counter since we used the index
-                    flagCounter++;
+                    flagTotal++;
+
+                    // increment proof counter because we added a hash to the proof
+                    proofTotal++;
                 }
 
                 // mark this node as processed
@@ -169,16 +183,26 @@ library Multiproof {
             treeIndicesToProve = treeIndicesToProve.removeSortedDuplicates();
         }
 
-        // create proofs array
-        proof = new bytes32[](virtualTree.length);
+        // populate proof and flag arrays
+        proof = new bytes32[](proofTotal);
+        flags = new bool[](flagTotal);
+
         uint256 proofCounter;
+        uint256 flagCounter;
         for (uint256 i = virtualTree.length - 1; i >= 0;) {
             // if there's a virtual tree entry, it means this hash is part of the proof
             if (virtualTree[i].includeInProof) {
                 proof[proofCounter] = tree[i];
 
-                // increment the counter
                 proofCounter++;
+            }
+
+            // if the virtual tree has children in the proof, then mark it as true or false 
+            // for whether the virtual tree has both or one child in the proof
+            if (virtualTree[i].children != Children.IS_LEAF) {
+                flags[flagCounter] = virtualTree[i].children == Children.BOTH;
+
+                flagCounter++;
             }
 
             if (i == 0) {
@@ -190,9 +214,5 @@ library Multiproof {
 
         // fetch root from tree
         root = tree[0];
-
-        // Resize the proof and flags arrays to remove any unused slots
-        proof = proofCounter > 0 ? proof.trimBytes32Array(proofCounter) : new bytes32[](0);
-        flags = flagCounter > 0 ? flags.trimBoolArray(flagCounter) : new bool[](0);
     }
 }

@@ -10,7 +10,7 @@ const values = [
   ["Kiwi"],       // 4
   ["Apple"],      // 5 
   ["Peach"],      // 6
-  ["Kumquat"],    // 7
+  // ["Kumquat"],    // 7
 ];
 
 // Build the merkle tree. Set the encoding to match the values.
