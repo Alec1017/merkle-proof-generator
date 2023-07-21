@@ -1,10 +1,10 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
 import "forge-std/console2.sol";
 import {Array} from "src/Array.sol";
 
-library MerkleMultiproofUtils {
+library Multiproof {
     using Array for uint256[];
     using Array for bytes32[];
     using Array for bool[];
@@ -37,6 +37,21 @@ library MerkleMultiproofUtils {
         // if i is odd, we subtract only 1 from the i value before dividing by 2.
         // Think of this operation as the reverse of leftChildIndex() and rightChildIndex().
         return (i + (i & 0x1) - 2) / 2;
+    }
+
+    function hashLeafPairs(bytes32 left, bytes32 right) private pure returns (bytes32 _hash) {
+        assembly {
+            switch lt(left, right)
+            case 0 {
+                mstore(0x0, right)
+                mstore(0x20, left)
+            }
+            default {
+                mstore(0x0, left)
+                mstore(0x20, right)
+            }
+            _hash := keccak256(0x0, 0x40)
+        }
     }
 
     function getTree(bytes32[] memory leaves) internal pure returns (bytes32[] memory tree) {
@@ -75,7 +90,7 @@ library MerkleMultiproofUtils {
         returns (bytes32[] memory proof, bool[] memory flags)
     {
         // generate a merkle tree from the data
-        bytes32[] memory tree = MerkleMultiproofUtils.getTree(leaves);
+        bytes32[] memory tree = getTree(leaves);
 
         // create a virtual tree
         virtualTreeNode[] memory virtualTree = new virtualTreeNode[](tree.length);
@@ -196,20 +211,5 @@ library MerkleMultiproofUtils {
         // Resize the proof and flags arrays to remove any unused slots
         proof = proofCounter > 0 ? proof.trimBytes32Array(proofCounter) : new bytes32[](0);
         flags = flagCounter > 0 ? flags.trimBoolArray(flagCounter) : new bool[](0);
-    }
-
-    function hashLeafPairs(bytes32 left, bytes32 right) internal pure returns (bytes32 _hash) {
-        assembly {
-            switch lt(left, right)
-            case 0 {
-                mstore(0x0, right)
-                mstore(0x20, left)
-            }
-            default {
-                mstore(0x0, left)
-                mstore(0x20, right)
-            }
-            _hash := keccak256(0x0, 0x40)
-        }
     }
 }

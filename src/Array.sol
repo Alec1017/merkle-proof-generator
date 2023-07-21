@@ -1,7 +1,7 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-library ArrayUtils {
+library Array {
     // removes duplicates from a sorted array
     function removeSortedDuplicates(uint256[] memory sortedArr) public pure returns (uint256[] memory) {
         require(sortedArr.length > 0, "must have an array with at least one value");
