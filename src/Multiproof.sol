@@ -9,29 +9,29 @@ library Multiproof {
     using Array for bytes32[];
     using Array for bool[];
 
-    struct virtualTreeNode {
+    struct VirtualTreeNode {
         // determines whether to include this node in the multiproof
         bool includeInProof;
         // determines whether this node has already been processed during multiproof generation
         bool processed;
     }
 
-    function leftChildIndex(uint256 i) private pure returns (uint256) {
+    function _leftChildIndex(uint256 i) private pure returns (uint256) {
         return 2 * i + 1;
     }
 
-    function rightChildIndex(uint256 i) private pure returns (uint256) {
+    function _rightChildIndex(uint256 i) private pure returns (uint256) {
         return 2 * i + 2;
     }
 
-    function siblingIndex(uint256 i) private pure returns (uint256) {
+    function _siblingIndex(uint256 i) private pure returns (uint256) {
         require(i > 0, "There is no sibling index for 0");
 
         // if i is odd, add 1. otherwise subtract 1
         return i & 0x1 == 1 ? i + 1 : i - 1;
     }
 
-    function parentIndex(uint256 i) private pure returns (uint256) {
+    function _parentIndex(uint256 i) private pure returns (uint256) {
         require(i > 0, "There is no parent index for 0");
 
         // if i is odd, we subtract only 1 from the i value before dividing by 2.
@@ -39,7 +39,7 @@ library Multiproof {
         return (i + (i & 0x1) - 2) / 2;
     }
 
-    function hashLeafPairs(bytes32 left, bytes32 right) private pure returns (bytes32 _hash) {
+    function _hashLeafPairs(bytes32 left, bytes32 right) private pure returns (bytes32 _hash) {
         assembly {
             switch lt(left, right)
             case 0 {
@@ -67,7 +67,7 @@ library Multiproof {
         // the parent nodes
         for (uint256 i = tree.length - 1 - leaves.length; i >= 0;) {
             // the parent is the hash of the left child and the right child
-            tree[i] = hashLeafPairs(tree[leftChildIndex(i)], tree[rightChildIndex(i)]);
+            tree[i] = _hashLeafPairs(tree[_leftChildIndex(i)], tree[_rightChildIndex(i)]);
 
             // an underflow error is hit on the final iteration. This check avoids the final decrement.
             if (i == 0) {
@@ -87,19 +87,19 @@ library Multiproof {
     function getMultiproof(bytes32[] memory leaves, uint256[] memory leafIndicesToProve)
         internal
         pure
-        returns (bytes32[] memory proof, bool[] memory flags)
+        returns (bytes32 root, bytes32[] memory proof, bool[] memory flags)
     {
         // generate a merkle tree from the data
         bytes32[] memory tree = getTree(leaves);
 
         // create a virtual tree
-        virtualTreeNode[] memory virtualTree = new virtualTreeNode[](tree.length);
+        VirtualTreeNode[] memory virtualTree = new VirtualTreeNode[](tree.length);
 
         // check if no indices to prove were passed, then just return the root
         if (leafIndicesToProve.length == 0) {
             proof = new bytes32[](1);
             proof[0] = tree[0];
-            return (proof, flags);
+            return (tree[0], proof, flags);
         }
 
         // convert leafIndicesToProve to align with the tree indices
@@ -127,13 +127,10 @@ library Multiproof {
                 // skip this node if it has already been processed
                 if (virtualTree[treeIndex].processed) {
                     // convert the current index to the parent index
-                    treeIndicesToProve[i] = parentIndex(treeIndex);
+                    treeIndicesToProve[i] = _parentIndex(treeIndex);
 
                     continue;
                 }
-                console2.log("virtual tree node processed", virtualTree[treeIndex].processed);
-
-                console2.log("current index is:", treeIndex);
 
                 // check to see if the sibling has turned on this node
                 if (virtualTree[treeIndex].includeInProof) {
@@ -145,20 +142,12 @@ library Multiproof {
                     // set this node to false in the virtual tree so it is not
                     // included in the final proof
                     virtualTree[treeIndex].includeInProof = false;
-
-                    console2.log("sibling %d has already turned on this node", siblingIndex(treeIndex));
-                    console2.log("we turn off current node: %d", treeIndex);
-                    console2.log(
-                        "flag counter is currently: %d, but we change counter index: %d to true",
-                        flagCounter,
-                        flagCounter - 1
-                    );
                 }
                 // this node hasnt been turned on by its sibling yet,
                 // so it hasnt appeared in the list of nodes to prove.
                 else {
                     // So, we can make sure the sibling gets added to the proof
-                    virtualTree[siblingIndex(treeIndex)].includeInProof = true;
+                    virtualTree[_siblingIndex(treeIndex)].includeInProof = true;
 
                     // now we make sure the flag array is false, because we need to include
                     // the sibling hash. This value can be overridden by the sibling
@@ -167,23 +156,14 @@ library Multiproof {
 
                     // increment the flag counter since we used the index
                     flagCounter++;
-
-                    console2.log(
-                        "sibling %d has NOT turned on this node, so set sibling to true", siblingIndex(treeIndex)
-                    );
-                    console2.log("flag counter is currently: %d, and we set it to false", flagCounter - 1);
                 }
-
-                console2.log("--------------------");
 
                 // mark this node as processed
                 virtualTree[treeIndex].processed = true;
 
                 // convert the current index to the parent index
-                treeIndicesToProve[i] = parentIndex(treeIndex);
+                treeIndicesToProve[i] = _parentIndex(treeIndex);
             }
-
-            console2.log("NEW LAYER STARTED");
 
             // remove duplicate parent indices
             treeIndicesToProve = treeIndicesToProve.removeSortedDuplicates();
@@ -207,6 +187,9 @@ library Multiproof {
                 i--;
             }
         }
+
+        // fetch root from tree
+        root = tree[0];
 
         // Resize the proof and flags arrays to remove any unused slots
         proof = proofCounter > 0 ? proof.trimBytes32Array(proofCounter) : new bytes32[](0);

@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import "forge-std/Test.sol";
 import "forge-std/console2.sol";
-
+import {MerkleProof} from "openzeppelin/utils/cryptography/MerkleProof.sol";
 import {Multiproof} from "src/Multiproof.sol";
 
 contract TestMultiproof is Test {
@@ -29,24 +29,37 @@ contract TestMultiproof is Test {
 
     function testMerkleMultiProof() public {
 
-        uint256[] memory leavesToProve = new uint256[](4);
-        leavesToProve[0] = 1;
-        leavesToProve[1] = 2;
-        leavesToProve[2] = 4;
-        leavesToProve[3] = 6;
+        uint256[] memory leafIndexesToProve = new uint256[](4);
+        leafIndexesToProve[0] = 1;
+        leafIndexesToProve[1] = 2;
+        leafIndexesToProve[2] = 4;
+        leafIndexesToProve[3] = 6;
 
-        (bytes32[] memory proof, bool[] memory flags) = Multiproof.getMultiproof(data, leavesToProve);
+        bytes32[] memory leavesToProve = new bytes32[](4);
+        leavesToProve[0] = data[1];
+        leavesToProve[1] = data[2];
+        leavesToProve[2] = data[4];
+        leavesToProve[3] = data[6];
 
-        console2.log("proof:");
-        for (uint256 i = 0; i < proof.length; i++) {
-            console2.logBytes32(proof[i]);
-        }
+        (bytes32 root, bytes32[] memory proof, bool[] memory flags) = Multiproof.getMultiproof(data, leafIndexesToProve);
 
-        console2.log("flags:");
-        for (uint256 i = 0; i < flags.length; i++) {
-            console2.log(flags[i]);
-        }
+        // console2.log("proof:");
+        // for (uint256 i = 0; i < proof.length; i++) {
+        //     console2.logBytes32(proof[i]);
+        // }
 
-        assertTrue(true);
+        // console2.log("flags:");
+        // for (uint256 i = 0; i < flags.length; i++) {
+        //     console2.log(flags[i]);
+        // }
+
+        bool isVerified = MerkleProof.multiProofVerify(
+            proof,
+            flags,
+            root,
+            leavesToProve
+        );
+
+        assertTrue(isVerified);
     }
 }
