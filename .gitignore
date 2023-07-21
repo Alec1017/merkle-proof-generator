@@ -12,3 +12,7 @@ docs/
 
 # Dotenv file
 .env
+
+# Differential tests
+differential_test/**/node_modules
+differential_test/**/tree.json
