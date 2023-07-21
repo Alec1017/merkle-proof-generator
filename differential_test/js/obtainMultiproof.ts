@@ -5,7 +5,7 @@ import fs from "fs";
 const tree = StandardMerkleTree.load(JSON.parse(fs.readFileSync("tree.json", 'utf-8')));
 
 // obtain the multiproof
-const { proof, proofFlags, leaves } = tree.getMultiProof([0, 1, 2, 3, 4, 5, 6, 7]);
+const { proof, proofFlags, leaves } = tree.getMultiProof([0, 7]);
 console.log("proof:", proof);
 console.log("proof flags: ", proofFlags);
 console.log("leaves:", leaves);

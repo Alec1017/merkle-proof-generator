@@ -6,7 +6,7 @@ import "forge-std/console2.sol";
 
 import {Multiproof} from "src/Multiproof.sol";
 
-contract TestUnit is Test {
+contract TestSequential is Test {
 
     bytes32[] public leavesSeven;
     bytes32[] public leavesEight;
