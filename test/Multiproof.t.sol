@@ -43,16 +43,6 @@ contract TestMultiproof is Test {
 
         (bytes32 root, bytes32[] memory proof, bool[] memory flags) = Multiproof.getMultiproof(data, leafIndexesToProve);
 
-        // console2.log("proof:");
-        // for (uint256 i = 0; i < proof.length; i++) {
-        //     console2.logBytes32(proof[i]);
-        // }
-
-        // console2.log("flags:");
-        // for (uint256 i = 0; i < flags.length; i++) {
-        //     console2.log(flags[i]);
-        // }
-
         bool isVerified = MerkleProof.multiProofVerify(
             proof,
             flags,
