@@ -109,78 +109,107 @@ library Multiproof {
             return (tree[0], proof, flags);
         }
 
-        // convert leafIndicesToProve to align with the tree indices
-        // tree indices will be reversed
-        uint256[] memory treeIndicesToProve = new uint256[](leafIndicesToProve.length);
+        // load up the static queue with the indices of the nodes to prove, converted
+        // to their corresponding indices in the tree
+        uint256 pop;
+        uint256 push;
+        console2.log("## load stack ##");
+        uint256[] memory staticQueue = new uint256[](leafIndicesToProve.length);
         for (uint256 i = 0; i < leafIndicesToProve.length; i++) {
-            treeIndicesToProve[i] = tree.length - 1 - leafIndicesToProve[i];
+            staticQueue[i] = tree.length - 1 - leafIndicesToProve[i];
+            console2.log("stack index: %d", staticQueue[i]);
         }
+        console2.log("## done loading stack ##");
 
         uint256 flagTotal;
         uint256 proofTotal;
 
         while (true) {
             // break when there is one index left to check, and its the root node
-            if (treeIndicesToProve.length == 1 && treeIndicesToProve[0] == 0) {
+            if (staticQueue[pop] == 0) {
                 break;
             }
 
-            // loop through the tree index for each node to prove
-            for (uint256 i = 0; i < treeIndicesToProve.length; i++) {
-                // current node in the tree to determine inclusion in the multiproof
-                uint256 treeIndex = treeIndicesToProve[i];
+            // pop an item off the stack to determine inclusion in the multiproof
+            uint256 treeIndex = staticQueue[pop++];
 
-                // skip this node if it has already been processed
-                if (virtualTree[treeIndex].processed) {
-                    // convert the current index to the parent index
-                    treeIndicesToProve[i] = _parentIndex(treeIndex);
+            console2.log("pop stack and get tree index %d", treeIndex);
+            console2.log("pop is now at %d", pop);
 
-                    continue;
-                }
+            // skip this node if it has already been processed
+            // if (virtualTree[treeIndex].processed) {
+            //     // convert the current index to the parent index
+            //     // treeIndicesToProve[i] = _parentIndex(treeIndex);
 
-                // check to see if the sibling has turned on this node
-                if (virtualTree[treeIndex].includeInProof) {
-                    // if it has, then it means we have the full sibling pair that
-                    // doesnt need to be included in the proof. So, we can set the
-                    // false bool flag set by the sibling to true.
-                    // flags[flagCounter - 1] = true;
-                    virtualTree[_parentIndex(treeIndex)].children = Children.BOTH;
+            //     console2.log("skipping node %d", treeIndex);
 
-                    // set this node to false in the virtual tree so it is not
-                    // included in the final proof
-                    virtualTree[treeIndex].includeInProof = false;
+            //     // // push the parent index to the queue
+            //     // staticQueue[push++] = _parentIndex(treeIndex);
 
-                    // decrement proof counter because we removed a hash from the proof
-                    proofTotal--;
-                }
-                // this node hasnt been turned on by its sibling yet,
-                // so it hasnt appeared in the list of nodes to prove.
-                else {
-                    // So, we can make sure the sibling gets added to the proof
-                    virtualTree[_siblingIndex(treeIndex)].includeInProof = true;
+            //     // console2.log("push is now at %d", push);
 
-                    // now we make sure the flag array is false, because we need to include
-                    // the sibling hash. This value can be overridden by the sibling
-                    // if it is also included in the array of leaves to prove
-                    // flags[flagCounter] = false;
-                    virtualTree[_parentIndex(treeIndex)].children = Children.ONE;
+            //     continue;
+            // }
 
-                    // increment the flag counter since we used the index
-                    flagTotal++;
+            // check to see if the sibling has turned on this node
+            if (virtualTree[treeIndex].includeInProof) {
+                // if it has, then it means we have the full sibling pair that
+                // doesnt need to be included in the proof. So, we can set the
+                // false bool flag set by the sibling to true.
+                virtualTree[_parentIndex(treeIndex)].children = Children.BOTH;
 
-                    // increment proof counter because we added a hash to the proof
-                    proofTotal++;
-                }
+                // set this node to false in the virtual tree so it is not
+                // included in the final proof
+                virtualTree[treeIndex].includeInProof = false;
 
-                // mark this node as processed
-                virtualTree[treeIndex].processed = true;
+                // decrement proof counter because we removed a hash from the proof
+                proofTotal--;
+            }
+            // this node hasnt been turned on by its sibling yet,
+            // so it hasnt appeared in the list of nodes to prove.
+            else {
+                // So, we can make sure the sibling gets added to the proof
+                virtualTree[_siblingIndex(treeIndex)].includeInProof = true;
 
-                // convert the current index to the parent index
-                treeIndicesToProve[i] = _parentIndex(treeIndex);
+                // now we make sure the flag array is false, because we need to include
+                // the sibling hash. This value can be overridden by the sibling
+                // if it is also included in the array of leaves to prove
+                virtualTree[_parentIndex(treeIndex)].children = Children.ONE;
+
+                // push the parent index to the queue
+                staticQueue[push++] = _parentIndex(treeIndex);
+
+                // increment the flag counter since we used the index
+                flagTotal++;
+
+                // increment proof counter because we added a hash to the proof
+                proofTotal++;
             }
 
-            // remove duplicate parent indices
-            treeIndicesToProve = treeIndicesToProve.removeSortedDuplicates();
+            // // mark this node as processed
+            // virtualTree[treeIndex].processed = true;
+
+            // // convert the current index to the parent index
+            // treeIndicesToProve[i] = _parentIndex(treeIndex);
+
+            console2.log("pushing parent %d to queue at index %d", _parentIndex(treeIndex), push);
+
+            // // push the parent index to the queue
+            // staticQueue[push++] = _parentIndex(treeIndex);
+
+            console2.log("push is now at %d", push);
+
+            // perform a modulus operation on the queue pointers
+            uint256 popMod = pop % staticQueue.length;
+            uint256 pushMod = push % staticQueue.length;
+
+            pop = popMod;
+            push = pushMod;
+
+            console2.log("performing modulus on pop:  %d -> %d", pop, popMod);
+            console2.log("performing modulus on push: %d -> %d", push, pushMod);
+
+            console2.log("-------------------------------------");
         }
 
         // populate proof and flag arrays
