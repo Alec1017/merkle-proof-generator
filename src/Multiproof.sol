@@ -113,43 +113,22 @@ library Multiproof {
         // to their corresponding indices in the tree
         uint256 pop;
         uint256 push;
-        console2.log("## load stack ##");
         uint256[] memory staticQueue = new uint256[](leafIndicesToProve.length);
         for (uint256 i = 0; i < leafIndicesToProve.length; i++) {
             staticQueue[i] = tree.length - 1 - leafIndicesToProve[i];
-            console2.log("stack index: %d", staticQueue[i]);
         }
-        console2.log("## done loading stack ##");
 
         uint256 flagTotal;
         uint256 proofTotal;
 
         while (true) {
-            // break when there is one index left to check, and its the root node
+            // break when the root node is on the stack
             if (staticQueue[pop] == 0) {
                 break;
             }
 
             // pop an item off the stack to determine inclusion in the multiproof
             uint256 treeIndex = staticQueue[pop++];
-
-            console2.log("pop stack and get tree index %d", treeIndex);
-            console2.log("pop is now at %d", pop);
-
-            // skip this node if it has already been processed
-            // if (virtualTree[treeIndex].processed) {
-            //     // convert the current index to the parent index
-            //     // treeIndicesToProve[i] = _parentIndex(treeIndex);
-
-            //     console2.log("skipping node %d", treeIndex);
-
-            //     // // push the parent index to the queue
-            //     // staticQueue[push++] = _parentIndex(treeIndex);
-
-            //     // console2.log("push is now at %d", push);
-
-            //     continue;
-            // }
 
             // check to see if the sibling has turned on this node
             if (virtualTree[treeIndex].includeInProof) {
@@ -186,30 +165,9 @@ library Multiproof {
                 proofTotal++;
             }
 
-            // // mark this node as processed
-            // virtualTree[treeIndex].processed = true;
-
-            // // convert the current index to the parent index
-            // treeIndicesToProve[i] = _parentIndex(treeIndex);
-
-            console2.log("pushing parent %d to queue at index %d", _parentIndex(treeIndex), push);
-
-            // // push the parent index to the queue
-            // staticQueue[push++] = _parentIndex(treeIndex);
-
-            console2.log("push is now at %d", push);
-
             // perform a modulus operation on the queue pointers
-            uint256 popMod = pop % staticQueue.length;
-            uint256 pushMod = push % staticQueue.length;
-
-            pop = popMod;
-            push = pushMod;
-
-            console2.log("performing modulus on pop:  %d -> %d", pop, popMod);
-            console2.log("performing modulus on push: %d -> %d", push, pushMod);
-
-            console2.log("-------------------------------------");
+            pop = pop % staticQueue.length;
+            push = push % staticQueue.length;
         }
 
         // populate proof and flag arrays
