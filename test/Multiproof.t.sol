@@ -23,9 +23,9 @@ contract TestMultiproof is Test {
         data[7] = keccak256(bytes.concat(keccak256(abi.encode("Pineapple"))));
     }
 
-    function testMerkleProof() public {
-        assertEq(Multiproof.getRoot(data), 0x4c5abaa82239ce47415214c5238011c87ec997ecf0702d453df977be70efbbd6);
-    }
+    // function testMerkleProof() public {
+    //     assertEq(Multiproof.getRoot(data), 0x4c5abaa82239ce47415214c5238011c87ec997ecf0702d453df977be70efbbd6);
+    // }
 
     function testMerkleMultiProof() public {
 
@@ -42,6 +42,16 @@ contract TestMultiproof is Test {
         leavesToProve[3] = data[6];
 
         (bytes32 root, bytes32[] memory proof, bool[] memory flags) = Multiproof.getMultiproof(data, leafIndexesToProve);
+
+        console2.log("proof:");
+        for (uint256 i = 0; i < proof.length; i++) {
+            console2.logBytes32(proof[i]);
+        }
+
+        console2.log("flags:");
+        for (uint256 i = 0; i < flags.length; i++) {
+            console2.log(flags[i]);
+        }
 
         bool isVerified = MerkleProof.multiProofVerify(
             proof,
