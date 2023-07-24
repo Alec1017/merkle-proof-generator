@@ -11,6 +11,7 @@ import {Assertions} from "test/Assertions.sol";
 contract TestProver is Test {
     using Array for uint256[];
 
+    /// forge-config: default.fuzz.runs = 1000
     function testOpenZeppelinProverCompatibility(bytes32[] memory leaves, uint256[] memory leafIndicesToProve) public {
         // number of leaves to prove should be less than or equal to the number of leaves in the tree
         vm.assume(leaves.length >= leafIndicesToProve.length);
