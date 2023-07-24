@@ -1,5 +1,5 @@
 import { StandardMerkleTree } from "@openzeppelin/merkle-tree";
-import fs from "fs";
+import * as fs from "fs";
 
 // Get the values to include in the tree. (Note: Consider reading them from a file.)
 const values = [

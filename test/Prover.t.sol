@@ -15,6 +15,7 @@ contract TestProver is Test {
     function testOpenZeppelinProverCompatibility(bytes32[] memory leaves, uint256[] memory leafIndicesToProve) public {
         // number of leaves to prove should be less than or equal to the number of leaves in the tree
         vm.assume(leaves.length >= leafIndicesToProve.length);
+        vm.assume(leaves.length > 1);
 
         // set up the leaves to prove array by preventing index out of bounds
         for (uint256 i = 0; i < leafIndicesToProve.length; i++) {

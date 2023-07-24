@@ -1,5 +1,5 @@
 import { StandardMerkleTree } from "@openzeppelin/merkle-tree";
-import fs from "fs";
+import * as fs from "fs";
 
 // Load the tree from the description that was generated previously.
 const tree = StandardMerkleTree.load(JSON.parse(fs.readFileSync("tree.json", 'utf-8')));
