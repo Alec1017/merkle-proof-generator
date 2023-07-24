@@ -174,6 +174,9 @@ library Multiproof {
             }
         }
 
+        // fetch root from tree
+        root = tree[0].dataHash;
+
         // check if no indices to prove were given
         if (leafIndicesToProve.length == 0) {
             proof = new bytes32[](1);
@@ -184,9 +187,6 @@ library Multiproof {
             // populate proof and flag arrays
             proof = new bytes32[](proofTotal);
             flags = new bool[](flagTotal);
-
-            // fetch root from tree
-            root = tree[0].dataHash;
 
             // counters for tracking the indices of the proof and flags arrays
             uint256 proofCounter;

@@ -4,9 +4,10 @@ pragma solidity ^0.8.20;
 import "forge-std/Test.sol";
 import "forge-std/console2.sol";
 
+import {Assertions} from "test/Assertions.sol";
 import {Multiproof} from "src/Multiproof.sol";
 
-contract TestSequential is Test {
+contract TestSequential is Assertions {
 
     bytes32[] public leavesSeven;
     bytes32[] public leavesEight;
@@ -34,34 +35,11 @@ contract TestSequential is Test {
         leavesEight[7] = keccak256(bytes.concat(keccak256(abi.encode("Pineapple"))));
     }
 
-    function _assertProof(bytes32[] memory proof, bytes32[] memory openZeppelinProof) internal {
-        // assert proof array has equal length as OZ
-        assertEq(proof.length, openZeppelinProof.length);
-
-        // assert proof values are correct
-        for (uint256 i = 0; i < openZeppelinProof.length; i++) {
-            assertEq(proof[i], openZeppelinProof[i]);
-        }
-    }
-
-    function _assertFlags(bool[] memory flags, bool[] memory openZeppelinFlags) internal {
-        // assert flag arrays have equal length as OZ
-        assertEq(flags.length, openZeppelinFlags.length);
-
-        // assert flag values are correct
-        for (uint256 i = 0; i < openZeppelinFlags.length; i++) {
-            assertEq(flags[i], openZeppelinFlags[i]);
-        }
-    }
-
     // solhint-disable-next-line func-name-mixedcase
     function test_size7_sequential_0() public {
         
         // build up the leaves to prove 
         uint256[] memory leavesToProve = new uint256[](0);
-
-        // generate the multiproof
-        (, bytes32[] memory proof, bool[] memory flags) = Multiproof.getMultiproof(leavesSeven, leavesToProve);
 
         // the expected proof from OpenZeppelin
         bytes32[] memory openZeppelinProof = new bytes32[](1);
@@ -70,9 +48,8 @@ contract TestSequential is Test {
         // the expected flags from OpenZeppelin
         bool[] memory openZeppelinFlags = new bool[](0);
 
-        // assert proofs and flags are equal
-        _assertProof(proof, openZeppelinProof);
-        _assertFlags(flags, openZeppelinFlags);
+        // assert proof works with Open Zeppelin verifier
+        assertMultiproofVerify(leavesSeven, leavesToProve, openZeppelinProof, openZeppelinFlags);
     }    
 
     // solhint-disable-next-line func-name-mixedcase
@@ -81,9 +58,6 @@ contract TestSequential is Test {
         // build up the leaves to prove 
         uint256[] memory leavesToProve = new uint256[](1);
         leavesToProve[0] = 0; // peach
-
-        // generate the multiproof
-        (, bytes32[] memory proof, bool[] memory flags) = Multiproof.getMultiproof(leavesSeven, leavesToProve);
 
         // the expected proof from OpenZeppelin
         bytes32[] memory openZeppelinProof = new bytes32[](3);
@@ -97,9 +71,8 @@ contract TestSequential is Test {
         openZeppelinFlags[1] = false;
         openZeppelinFlags[2] = false;
         
-        // assert proofs and flags are equal
-        _assertProof(proof, openZeppelinProof);
-        _assertFlags(flags, openZeppelinFlags);
+        // assert proof works with Open Zeppelin verifier
+        assertMultiproofVerify(leavesSeven, leavesToProve, openZeppelinProof, openZeppelinFlags);
     }
 
     // solhint-disable-next-line func-name-mixedcase
@@ -109,9 +82,6 @@ contract TestSequential is Test {
         uint256[] memory leavesToProve = new uint256[](2);
         leavesToProve[0] = 0; // peach
         leavesToProve[1] = 1; // apple
-
-        // generate the multiproof
-        (, bytes32[] memory proof, bool[] memory flags) = Multiproof.getMultiproof(leavesSeven, leavesToProve);
 
         // the expected proof from OpenZeppelin
         bytes32[] memory openZeppelinProof = new bytes32[](2);
@@ -124,9 +94,8 @@ contract TestSequential is Test {
         openZeppelinFlags[1] = false;
         openZeppelinFlags[2] = false;
         
-        // assert proofs and flags are equal
-        _assertProof(proof, openZeppelinProof);
-        _assertFlags(flags, openZeppelinFlags);
+        // assert proof works with Open Zeppelin verifier
+        assertMultiproofVerify(leavesSeven, leavesToProve, openZeppelinProof, openZeppelinFlags);
     }
 
     // solhint-disable-next-line func-name-mixedcase
@@ -137,9 +106,6 @@ contract TestSequential is Test {
         leavesToProve[0] = 0; // peach
         leavesToProve[1] = 1; // apple
         leavesToProve[2] = 2; // kiwi
-
-        // generate the multiproof
-        (, bytes32[] memory proof, bool[] memory flags) = Multiproof.getMultiproof(leavesSeven, leavesToProve);
 
         // the expected proof from OpenZeppelin
         bytes32[] memory openZeppelinProof = new bytes32[](3);
@@ -155,9 +121,8 @@ contract TestSequential is Test {
         openZeppelinFlags[3] = false;
         openZeppelinFlags[4] = true;
         
-        // assert proofs and flags are equal
-        _assertProof(proof, openZeppelinProof);
-        _assertFlags(flags, openZeppelinFlags);
+        // assert proof works with Open Zeppelin verifier
+        assertMultiproofVerify(leavesSeven, leavesToProve, openZeppelinProof, openZeppelinFlags);
     }
 
     // solhint-disable-next-line func-name-mixedcase
@@ -169,9 +134,6 @@ contract TestSequential is Test {
         leavesToProve[1] = 1; // apple
         leavesToProve[2] = 2; // kiwi
         leavesToProve[3] = 3; // lemon
-
-        // generate the multiproof
-        (, bytes32[] memory proof, bool[] memory flags) = Multiproof.getMultiproof(leavesSeven, leavesToProve);
 
         // the expected proof from OpenZeppelin
         bytes32[] memory openZeppelinProof = new bytes32[](2);
@@ -186,9 +148,8 @@ contract TestSequential is Test {
         openZeppelinFlags[3] = false;
         openZeppelinFlags[4] = true;
         
-        // assert proofs and flags are equal
-        _assertProof(proof, openZeppelinProof);
-        _assertFlags(flags, openZeppelinFlags);
+        // assert proof works with Open Zeppelin verifier
+        assertMultiproofVerify(leavesSeven, leavesToProve, openZeppelinProof, openZeppelinFlags);
     }
 
     // solhint-disable-next-line func-name-mixedcase
@@ -201,9 +162,6 @@ contract TestSequential is Test {
         leavesToProve[2] = 2; // kiwi
         leavesToProve[3] = 3; // lemon
         leavesToProve[4] = 4; // orange
-
-        // generate the multiproof
-        (, bytes32[] memory proof, bool[] memory flags) = Multiproof.getMultiproof(leavesSeven, leavesToProve);
 
         // the expected proof from OpenZeppelin
         bytes32[] memory openZeppelinProof = new bytes32[](2);
@@ -219,9 +177,8 @@ contract TestSequential is Test {
         openZeppelinFlags[4] = true;
         openZeppelinFlags[5] = true;
         
-        // assert proofs and flags are equal
-        _assertProof(proof, openZeppelinProof);
-        _assertFlags(flags, openZeppelinFlags);
+        // assert proof works with Open Zeppelin verifier
+        assertMultiproofVerify(leavesSeven, leavesToProve, openZeppelinProof, openZeppelinFlags);
     }
 
     // solhint-disable-next-line func-name-mixedcase
@@ -236,9 +193,6 @@ contract TestSequential is Test {
         leavesToProve[4] = 4; // orange
         leavesToProve[5] = 5; // banana
 
-        // generate the multiproof
-        (, bytes32[] memory proof, bool[] memory flags) = Multiproof.getMultiproof(leavesSeven, leavesToProve);
-
         // the expected proof from OpenZeppelin
         bytes32[] memory openZeppelinProof = new bytes32[](1);
         openZeppelinProof[0] = 0xf07ce44ac19ae4e371cbb0a575c6a1f14f469bc11e66ee0d7965fb09c7397725;
@@ -252,9 +206,8 @@ contract TestSequential is Test {
         openZeppelinFlags[4] = true;
         openZeppelinFlags[5] = true;
         
-        // assert proofs and flags are equal
-        _assertProof(proof, openZeppelinProof);
-        _assertFlags(flags, openZeppelinFlags);
+        // assert proof works with Open Zeppelin verifier
+        assertMultiproofVerify(leavesSeven, leavesToProve, openZeppelinProof, openZeppelinFlags);
     }
 
     // solhint-disable-next-line func-name-mixedcase
@@ -270,9 +223,6 @@ contract TestSequential is Test {
         leavesToProve[5] = 5; // banana
         leavesToProve[6] = 6; // pineapple
 
-        // generate the multiproof
-        (, bytes32[] memory proof, bool[] memory flags) = Multiproof.getMultiproof(leavesSeven, leavesToProve);
-
         // the expected proof from OpenZeppelin
         bytes32[] memory openZeppelinProof = new bytes32[](0);
 
@@ -285,9 +235,8 @@ contract TestSequential is Test {
         openZeppelinFlags[4] = true;
         openZeppelinFlags[5] = true;
         
-        // assert proofs and flags are equal
-        _assertProof(proof, openZeppelinProof);
-        _assertFlags(flags, openZeppelinFlags);
+        // assert proof works with Open Zeppelin verifier
+        assertMultiproofVerify(leavesSeven, leavesToProve, openZeppelinProof, openZeppelinFlags);
     }
 
     // solhint-disable-next-line func-name-mixedcase
@@ -296,9 +245,6 @@ contract TestSequential is Test {
         // build up the leaves to prove 
         uint256[] memory leavesToProve = new uint256[](0);
 
-        // generate the multiproof
-        (, bytes32[] memory proof, bool[] memory flags) = Multiproof.getMultiproof(leavesEight, leavesToProve);
-
         // the expected proof from OpenZeppelin
         bytes32[] memory openZeppelinProof = new bytes32[](1);
         openZeppelinProof[0] = 0x4c5abaa82239ce47415214c5238011c87ec997ecf0702d453df977be70efbbd6;
@@ -306,9 +252,8 @@ contract TestSequential is Test {
         // the expected flags from OpenZeppelin
         bool[] memory openZeppelinFlags = new bool[](0);
         
-        // assert proofs and flags are equal
-        _assertProof(proof, openZeppelinProof);
-        _assertFlags(flags, openZeppelinFlags);
+        // assert proof works with Open Zeppelin verifier
+        assertMultiproofVerify(leavesEight, leavesToProve, openZeppelinProof, openZeppelinFlags);
     }
 
     // solhint-disable-next-line func-name-mixedcase
@@ -317,9 +262,6 @@ contract TestSequential is Test {
         // build up the leaves to prove 
         uint256[] memory leavesToProve = new uint256[](1);
         leavesToProve[0] = 0; // kumquat
-
-        // generate the multiproof
-        (, bytes32[] memory proof, bool[] memory flags) = Multiproof.getMultiproof(leavesEight, leavesToProve);
 
         // the expected proof from OpenZeppelin
         bytes32[] memory openZeppelinProof = new bytes32[](3);
@@ -333,9 +275,8 @@ contract TestSequential is Test {
         openZeppelinFlags[1] = false;
         openZeppelinFlags[2] = false;
         
-        // assert proofs and flags are equal
-        _assertProof(proof, openZeppelinProof);
-        _assertFlags(flags, openZeppelinFlags);
+        // assert proof works with Open Zeppelin verifier
+        assertMultiproofVerify(leavesEight, leavesToProve, openZeppelinProof, openZeppelinFlags);
     }
 
     // solhint-disable-next-line func-name-mixedcase
@@ -345,9 +286,6 @@ contract TestSequential is Test {
         uint256[] memory leavesToProve = new uint256[](2);
         leavesToProve[0] = 0; // kumquat
         leavesToProve[1] = 1; // peach
-
-        // generate the multiproof
-        (, bytes32[] memory proof, bool[] memory flags) = Multiproof.getMultiproof(leavesEight, leavesToProve);
 
         // the expected proof from OpenZeppelin
         bytes32[] memory openZeppelinProof = new bytes32[](2);
@@ -360,9 +298,8 @@ contract TestSequential is Test {
         openZeppelinFlags[1] = false;
         openZeppelinFlags[2] = false;
         
-        // assert proofs and flags are equal
-        _assertProof(proof, openZeppelinProof);
-        _assertFlags(flags, openZeppelinFlags);
+        // assert proof works with Open Zeppelin verifier
+        assertMultiproofVerify(leavesEight, leavesToProve, openZeppelinProof, openZeppelinFlags);
     }
 
     // solhint-disable-next-line func-name-mixedcase
@@ -373,9 +310,6 @@ contract TestSequential is Test {
         leavesToProve[0] = 0; // kumquat
         leavesToProve[1] = 1; // peach
         leavesToProve[2] = 2; // apple
-
-        // generate the multiproof
-        (, bytes32[] memory proof, bool[] memory flags) = Multiproof.getMultiproof(leavesEight, leavesToProve);
 
         // the expected proof from OpenZeppelin
         bytes32[] memory openZeppelinProof = new bytes32[](2);
@@ -389,9 +323,8 @@ contract TestSequential is Test {
         openZeppelinFlags[2] = true;
         openZeppelinFlags[3] = false;
         
-        // assert proofs and flags are equal
-        _assertProof(proof, openZeppelinProof);
-        _assertFlags(flags, openZeppelinFlags);
+        // assert proof works with Open Zeppelin verifier
+        assertMultiproofVerify(leavesEight, leavesToProve, openZeppelinProof, openZeppelinFlags);
     }
 
     // solhint-disable-next-line func-name-mixedcase
@@ -404,9 +337,6 @@ contract TestSequential is Test {
         leavesToProve[2] = 2; // apple
         leavesToProve[3] = 3; // kiwi
 
-        // generate the multiproof
-        (, bytes32[] memory proof, bool[] memory flags) = Multiproof.getMultiproof(leavesEight, leavesToProve);
-
         // the expected proof from OpenZeppelin
         bytes32[] memory openZeppelinProof = new bytes32[](1);
         openZeppelinProof[0] = 0x2a57f0f80f87fb667c4ac5be7d24bb42205fb5c6c6225535ba2cb2eac488e7f0;
@@ -418,9 +348,8 @@ contract TestSequential is Test {
         openZeppelinFlags[2] = true;
         openZeppelinFlags[3] = false;
         
-        // assert proofs and flags are equal
-        _assertProof(proof, openZeppelinProof);
-        _assertFlags(flags, openZeppelinFlags);
+        // assert proof works with Open Zeppelin verifier
+        assertMultiproofVerify(leavesEight, leavesToProve, openZeppelinProof, openZeppelinFlags);
     }
 
     // solhint-disable-next-line func-name-mixedcase
@@ -433,9 +362,6 @@ contract TestSequential is Test {
         leavesToProve[2] = 2; // apple
         leavesToProve[3] = 3; // kiwi
         leavesToProve[4] = 4; // lemon
-
-        // generate the multiproof
-        (, bytes32[] memory proof, bool[] memory flags) = Multiproof.getMultiproof(leavesEight, leavesToProve);
 
         // the expected proof from OpenZeppelin
         bytes32[] memory openZeppelinProof = new bytes32[](2);
@@ -451,9 +377,8 @@ contract TestSequential is Test {
         openZeppelinFlags[4] = false;
         openZeppelinFlags[5] = true;
         
-        // assert proofs and flags are equal
-        _assertProof(proof, openZeppelinProof);
-        _assertFlags(flags, openZeppelinFlags);
+        // assert proof works with Open Zeppelin verifier
+        assertMultiproofVerify(leavesEight, leavesToProve, openZeppelinProof, openZeppelinFlags);
     }
 
     // solhint-disable-next-line func-name-mixedcase
@@ -468,9 +393,6 @@ contract TestSequential is Test {
         leavesToProve[4] = 4; // lemon
         leavesToProve[5] = 5; // orange
 
-        // generate the multiproof
-        (, bytes32[] memory proof, bool[] memory flags) = Multiproof.getMultiproof(leavesEight, leavesToProve);
-
         // the expected proof from OpenZeppelin
         bytes32[] memory openZeppelinProof = new bytes32[](1);
         openZeppelinProof[0] = 0xe0682f6a7668708b4c95c44f384dbe1c846f91115c7b379f279bc695ad39722c;
@@ -484,9 +406,8 @@ contract TestSequential is Test {
         openZeppelinFlags[4] = false;
         openZeppelinFlags[5] = true;
         
-        // assert proofs and flags are equal
-        _assertProof(proof, openZeppelinProof);
-        _assertFlags(flags, openZeppelinFlags);
+        // assert proof works with Open Zeppelin verifier
+        assertMultiproofVerify(leavesEight, leavesToProve, openZeppelinProof, openZeppelinFlags);
     }
 
     // solhint-disable-next-line func-name-mixedcase
@@ -502,9 +423,6 @@ contract TestSequential is Test {
         leavesToProve[5] = 5; // orange
         leavesToProve[6] = 6; // banana
 
-        // generate the multiproof
-        (, bytes32[] memory proof, bool[] memory flags) = Multiproof.getMultiproof(leavesEight, leavesToProve);
-
         // the expected proof from OpenZeppelin
         bytes32[] memory openZeppelinProof = new bytes32[](1);
         openZeppelinProof[0] = 0xf07ce44ac19ae4e371cbb0a575c6a1f14f469bc11e66ee0d7965fb09c7397725;
@@ -519,9 +437,8 @@ contract TestSequential is Test {
         openZeppelinFlags[5] = true;
         openZeppelinFlags[6] = true;
         
-        // assert proofs and flags are equal
-        _assertProof(proof, openZeppelinProof);
-        _assertFlags(flags, openZeppelinFlags);
+        // assert proof works with Open Zeppelin verifier
+        assertMultiproofVerify(leavesEight, leavesToProve, openZeppelinProof, openZeppelinFlags);
     }
 
     // solhint-disable-next-line func-name-mixedcase
@@ -538,9 +455,6 @@ contract TestSequential is Test {
         leavesToProve[6] = 6; // banana
         leavesToProve[7] = 7; // pineapple
 
-        // generate the multiproof
-        (, bytes32[] memory proof, bool[] memory flags) = Multiproof.getMultiproof(leavesEight, leavesToProve);
-
         // the expected proof from OpenZeppelin
         bytes32[] memory openZeppelinProof = new bytes32[](0);
 
@@ -554,8 +468,7 @@ contract TestSequential is Test {
         openZeppelinFlags[5] = true;
         openZeppelinFlags[6] = true;
         
-        // assert proofs and flags are equal
-        _assertProof(proof, openZeppelinProof);
-        _assertFlags(flags, openZeppelinFlags);
+        // assert proof works with Open Zeppelin verifier
+        assertMultiproofVerify(leavesEight, leavesToProve, openZeppelinProof, openZeppelinFlags);
     }
 }
