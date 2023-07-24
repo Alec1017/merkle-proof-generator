@@ -41,7 +41,7 @@ library Array {
         require(sortedArr.length > 0, "must have an array with at least one value");
 
         // create result array placeholder
-        uint256[] memory result = new uint[](sortedArr.length);
+        uint256[] memory result = new uint256[](sortedArr.length);
 
         // add the first element of the array to the result, and set it as the
         // current value to check for duplicates against
@@ -61,7 +61,7 @@ library Array {
         }
 
         // Resize the result array to remove any unused slots
-        uint256[] memory finalResult = new uint[](count);
+        uint256[] memory finalResult = new uint256[](count);
         for (uint256 i = 0; i < count; i++) {
             finalResult[i] = result[i];
         }
