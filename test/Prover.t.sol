@@ -5,8 +5,9 @@ import "forge-std/Test.sol";
 import {MerkleProof} from "openzeppelin/utils/cryptography/MerkleProof.sol";
 
 import {Multiproof} from "src/Multiproof.sol";
-import {Array} from "src/Array.sol";
-import {Assertions} from "test/Assertions.sol";
+
+import {Array} from "test/utils/Array.sol";
+import {Assertions} from "test/utils/Assertions.sol";
 
 contract TestProver is Test {
     using Array for uint256[];
