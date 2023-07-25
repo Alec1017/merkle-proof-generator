@@ -16,7 +16,7 @@ To get differential tests set up:
 
 ### Example Usage
 
-```
+```solidity
 // OZ hashes the leaves like this, but it isn't mandatory for this library
 bytes32[] memory leaves = new bytes32[](4);
 leaves[0] = keccak256(bytes.concat(keccak256(abi.encode("Lemon"))));
@@ -30,7 +30,11 @@ leavesToProve[0] = 0; // lemon
 leavesToProve[1] = 2; // banana 
 
 // generate the multiproof
-(bytes32 root, bytes32[] memory proof, bool[] memory flags) = Multiproof.getMultiproof(leaves, leavesToProve);
+(
+    bytes32 root, 
+    bytes32[] memory proof, 
+    bool[] memory flags
+) = Multiproof.getMultiproof(leaves, leavesToProve);
 
 // OUTPUT
 // -------
