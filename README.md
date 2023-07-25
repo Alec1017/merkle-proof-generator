@@ -41,14 +41,14 @@ leavesToProve[1] = 2; // banana
 // root: 0x2a57f0f80f87fb667c4ac5be7d24bb42205fb5c6c6225535ba2cb2eac488e7f0
 //
 // proof: [
-//      0xe8e0064a49a1b6064455c7016b1ff3ce7f945d352584a7f2d1faacc0b777626d,
-//      0xf07ce44ac19ae4e371cbb0a575c6a1f14f469bc11e66ee0d7965fb09c7397725
+//     0xe8e0064a49a1b6064455c7016b1ff3ce7f945d352584a7f2d1faacc0b777626d,
+//     0xf07ce44ac19ae4e371cbb0a575c6a1f14f469bc11e66ee0d7965fb09c7397725
 // ]
 //
 // flags: [
-//    false
-//    false
-//    true
+//     false,
+//     false,
+//     true
 // ]
 ```
 
