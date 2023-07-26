@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
+    "generate-proof": "npx ts-node generateProof.ts",
     "generate-multiproof": "npx ts-node generateMultiproof.ts"
   },
   "author": "Alec DiFederico",
