@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {Multiproof} from "src/Multiproof.sol";
-
 import {Assertions} from "test/utils/Assertions.sol";
 
 contract TestSequential is Assertions {

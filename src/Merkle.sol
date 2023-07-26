@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import {log2, floor} from "prb-math/ud60x18/Math.sol";
 import {convert} from "prb-math/ud60x18/Conversions.sol";
 
-library Multiproof {
+library Merkle {
 
     enum Children {
         IS_LEAF,

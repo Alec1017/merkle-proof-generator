@@ -18,6 +18,8 @@ To get differential tests set up:
 
 proof:
 ```solidity
+import {Merkle} from "src/Merkle.sol";
+
 // OZ hashes the leaves like this, but it isn't mandatory for this library
 bytes32[] memory leaves = new bytes32[](4);
 leaves[0] = keccak256(bytes.concat(keccak256(abi.encode("Lemon"))));
@@ -32,7 +34,7 @@ uint256 leafToProve = 2; // Banana
 (
     bytes32 root, 
     bytes32[] memory proof
-) = Multiproof.getProof(leaves, leafToProve);
+) = Merkle.getProof(leaves, leafToProve);
 
 // OUTPUT
 // -------
@@ -46,6 +48,8 @@ uint256 leafToProve = 2; // Banana
 
 multiproof:
 ```solidity
+import {Merkle} from "src/Merkle.sol";
+
 // OZ hashes the leaves like this, but it isn't mandatory for this library
 bytes32[] memory leaves = new bytes32[](4);
 leaves[0] = keccak256(bytes.concat(keccak256(abi.encode("Lemon"))));
@@ -63,7 +67,7 @@ leavesToProve[1] = 2; // banana
     bytes32 root, 
     bytes32[] memory proof, 
     bool[] memory flags
-) = Multiproof.getMultiproof(leaves, leavesToProve);
+) = Merkle.getMultiproof(leaves, leavesToProve);
 
 // OUTPUT
 // -------

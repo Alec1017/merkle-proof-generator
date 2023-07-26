@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {Multiproof} from "src/Multiproof.sol";
+import {Merkle} from "src/Merkle.sol";
 
 import {Assertions} from "test/utils/Assertions.sol";
 import {Array} from "test/utils/Array.sol";
@@ -42,7 +42,7 @@ contract TestDifferential is Assertions {
         (
             bytes32 root, 
             bytes32[] memory proof
-        ) = Multiproof.getProof(openZeppelinLeaves, openZeppelinIndexToProve);
+        ) = Merkle.getProof(openZeppelinLeaves, openZeppelinIndexToProve);
         
         // assert root and proof are equal
         assertEq(root,  openZeppelinRoot);
@@ -84,7 +84,7 @@ contract TestDifferential is Assertions {
             bytes32 root, 
             bytes32[] memory proof, 
             bool[] memory flags
-        ) = Multiproof.getMultiproof(openZeppelinLeaves, openZeppelinIndices);
+        ) = Merkle.getMultiproof(openZeppelinLeaves, openZeppelinIndices);
 
         // assert root, proof, and flags are equal
         assertEq(root,  openZeppelinRoot);

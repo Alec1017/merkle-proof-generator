@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import "forge-std/Test.sol";
 import {MerkleProof} from "openzeppelin/utils/cryptography/MerkleProof.sol";
 
-import {Multiproof} from "src/Multiproof.sol";
+import {Merkle} from "src/Merkle.sol";
 
 contract Assertions is Test {
     event log_named_array(string key, bytes32[] val);
@@ -41,7 +41,7 @@ contract Assertions is Test {
         }
 
         // generate the multiproof
-        (bytes32 root, bytes32[] memory proof, bool[] memory flags) = Multiproof.getMultiproof(data, leafIndicesToProve);
+        (bytes32 root, bytes32[] memory proof, bool[] memory flags) = Merkle.getMultiproof(data, leafIndicesToProve);
 
 
         // verify the multiproof
