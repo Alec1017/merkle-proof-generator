@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import {log2, floor} from "prb-math/ud60x18/Math.sol";
+import {convert} from "prb-math/ud60x18/Conversions.sol";
+
 library Multiproof {
 
     enum Children {
@@ -57,7 +60,7 @@ library Multiproof {
         }
     }
 
-    function getTree(bytes32[] memory leaves) internal pure returns (bytes32[] memory tree) {
+    function _getTree(bytes32[] memory leaves) private pure returns (bytes32[] memory tree) {
         // create a merkle tree placeholder array
         tree = new bytes32[](2 * leaves.length - 1);
 
@@ -82,8 +85,41 @@ library Multiproof {
     }
 
     function getRoot(bytes32[] memory leaves) internal pure returns (bytes32 root) {
-        bytes32[] memory tree = getTree(leaves);
+        bytes32[] memory tree = _getTree(leaves);
 
+        root = tree[0];
+    }
+
+    function getProof(bytes32[] memory leaves, uint256 indexToProve) 
+        internal 
+        pure 
+        returns (bytes32 root, bytes32[] memory proof) 
+    {
+        require(indexToProve < leaves.length, "invalid index to prove");
+
+        // create a merkle tree
+        bytes32[] memory tree = _getTree(leaves);
+
+        // Convert the index to prove to its corresponding index in the tree
+        indexToProve = tree.length - 1 - indexToProve;
+
+        // proof length is the floor of log2(indexToProve + 1)
+        proof = new bytes32[](convert(floor(log2(convert(indexToProve + 1)))));
+        uint256 proofCounter;
+
+        // add each sibling to the proof, then prove the parent node
+        while (indexToProve > 0) {
+            // include the sibling in the proof
+            proof[proofCounter] = tree[_siblingIndex(indexToProve)];
+
+            // the next index to prove becomes the parent node
+            indexToProve = _parentIndex(indexToProve);
+
+            // increment the proof counter
+            proofCounter++;
+        }
+
+        // fetch root from tree
         root = tree[0];
     }
 

@@ -13,7 +13,23 @@ contract TestProver is Test {
     using Array for uint256[];
 
     /// forge-config: default.fuzz.runs = 1000
-    function testOpenZeppelinProverCompatibility(bytes32[] memory leaves, uint256[] memory leafIndicesToProve) public {
+    function testOpenZeppelinSingleProverCompatibility(bytes32[] memory leaves, uint256 leafIndexToProve) public {
+        // leaf index to prove should be less than or equal to the number of leaves in the tree
+        vm.assume(leaves.length > leafIndexToProve);
+        vm.assume(leaves.length > 1);
+
+        // generate the proof
+        (bytes32 root, bytes32[] memory proof) = Multiproof.getProof(leaves, leafIndexToProve);
+
+        // verify the multiproof
+        bool isVerified = MerkleProof.verify(proof, root, leaves[leafIndexToProve]);
+
+        // assert the multiproof can be verified by Open Zeppelin
+        assertTrue(isVerified, "Single proof verification was not valid");
+    }
+
+    /// forge-config: default.fuzz.runs = 1000
+    function testOpenZeppelinMultiProverCompatibility(bytes32[] memory leaves, uint256[] memory leafIndicesToProve) public {
         // number of leaves to prove should be less than or equal to the number of leaves in the tree
         vm.assume(leaves.length >= leafIndicesToProve.length);
         vm.assume(leaves.length > 1);
