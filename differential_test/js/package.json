@@ -1,5 +1,5 @@
 {
-  "name": "merkle-multiproof-generator",
+  "name": "merkle-proof-generator",
   "version": "1.0.0",
   "description": "",
   "scripts": {

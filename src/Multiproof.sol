@@ -61,12 +61,19 @@ library Multiproof {
     }
 
     function _getTree(bytes32[] memory leaves) private pure returns (bytes32[] memory tree) {
+        require(leaves.length > 0, "cannot build tree with 0 leaves");
+
         // create a merkle tree placeholder array
         tree = new bytes32[](2 * leaves.length - 1);
 
         // place all leaves into the tree
         for (uint256 i = 0; i < leaves.length; i++) {
             tree[tree.length - 1 - i] = leaves[i];
+        }
+
+        // a single leaf becomes the root
+        if (tree.length == 1) {
+            return tree;
         }
 
         // start from the back of the tree, at the first index before all the leaves, and build up
@@ -128,6 +135,8 @@ library Multiproof {
         pure
         returns (bytes32 root, bytes32[] memory proof, bool[] memory flags)
     {
+        require(leaves.length > 0, "cannot build tree with 0 leaves");
+
         // create a merkle tree
         MerkleTreeNode[] memory tree = new MerkleTreeNode[](2 * leaves.length - 1);
 
@@ -151,7 +160,7 @@ library Multiproof {
         // start from the bottom of the tree, and build up the parent nodes to the root
         for (uint256 i = tree.length - 1; i >= 0;) {
             // if the node is a leaf, then add the hash to the tree
-            if (i > tree.length - 1 - leaves.length) {
+            if (i + 1 > tree.length - leaves.length) {
                 tree[i].dataHash = leaves[tree.length - 1 - i];
             } 
             // otherwise, it has 2 children so we should calculate the hash
